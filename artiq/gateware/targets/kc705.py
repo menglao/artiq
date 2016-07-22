@@ -19,7 +19,8 @@ from misoc.integration.builder import builder_args, builder_argdict
 
 from artiq.gateware.soc import AMPSoC, build_artiq_soc
 from artiq.gateware import rtio, nist_qc1, nist_clock, nist_qc2
-from artiq.gateware.rtio.phy import ttl_simple, ttl_serdes_7series, dds, spi
+from artiq.gateware.rtio.phy import (ttl_simple, ttl_serdes_7series,
+                                     dds, spi, sawg)
 from artiq import __version__ as artiq_version
 
 
@@ -388,6 +389,55 @@ class NIST_QC2(_NIST_Ions):
         self.config["DDS_RTIO_CLK_RATIO"] = 24 >> self.rtio.fine_ts_width
 
 
+class Phaser(_NIST_Ions):
+    def __init__(self, cpu_type="or1k", **kwargs):
+        _NIST_Ions.__init__(self, cpu_type, **kwargs)
+
+        platform = self.platform
+        # TODO: dummy
+        platform.add_extension(nist_clock.fmc_adapter_io)
+
+        rtio_channels = []
+
+        phy = ttl_serdes_7series.Inout_8X(
+            platform.request("user_sma_gpio_n_33"))
+        self.submodules += phy
+        rtio_channels.append(rtio.Channel.from_phy(phy, ififo_depth=128))
+
+        phy = ttl_simple.Output(platform.request("user_led", 2))
+        self.submodules += phy
+        rtio_channels.append(rtio.Channel.from_phy(phy))
+
+        self.config["RTIO_REGULAR_TTL_COUNT"] = len(rtio_channels)
+
+        self.config["RTIO_FIRST_SPI_CHANNEL"] = len(rtio_channels)
+        # TODO: dummy, hookup ad9154 spi here
+        phy = spi.SPIMaster(self.platform.request("spi", 0))
+        self.submodules += phy
+        rtio_channels.append(rtio.Channel.from_phy(
+            phy, ofifo_depth=128, ififo_depth=128))
+
+        self.config["RTIO_FIRST_PHASER_CHANNEL"] = len(rtio_channels)
+        sawgs = [sawg.Channel(width=16, parallelism=4) for i in range(4)]
+        self.submodules += sawgs
+
+        # TODO: dummy, hookup jesd204b phy here
+        o = Signal((16, True))
+        for ch in sawgs:  # gather up dangling outputs
+            for oi in ch._ll.o:
+                o0, o = o, Signal.like(o)
+                self.sync += o.eq(o0 + oi)
+        self.sync.rio_phy += platform.request("dds").d.eq(o)
+
+        rtio_channels.extend(rtio.Channel.from_phy(phy)
+                             for sawg in sawgs
+                             for phy in sawg.phys)
+
+        self.config["RTIO_LOG_CHANNEL"] = len(rtio_channels)
+        rtio_channels.append(rtio.LogChannel())
+        self.add_rtio(rtio_channels)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="ARTIQ core device builder / KC705 "
@@ -407,6 +457,8 @@ def main():
         cls = NIST_CLOCK
     elif hw_adapter == "nist_qc2":
         cls = NIST_QC2
+    elif hw_adapter == "phaser":
+        cls = Phaser
     else:
         raise SystemExit("Invalid hardware adapter string (-H/--hw-adapter)")
 
