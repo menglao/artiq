@@ -5,20 +5,23 @@ from artiq.coredevice.rtio import rtio_output
 class SAWG:
     """Smart arbitrary waveform generator channel.
 
-    :param channel: RTIO channel number of the first channel (amplitude).
-        Frequency and Phase are assumed to be the subsequent channels.
+    :param channel_base: RTIO channel number of the first channel (amplitude).
+        Frequency and Phase are then assumed to be successive channels.
     """
     kernel_invariants = {"amplitude_scale", "frequency_scale", "phase_scale",
-                         "channel"}
+                         "channel_base"}
 
-    def __init__(self, dmgr, channel, parallelism=4, core_device="core"):
+    def __init__(self, dmgr, channel_base, parallelism=4, core_device="core"):
         self.core = dmgr.get(core_device)
-        self.channel = channel
+        self.channel_base = channel_base
         cordic_gain = 1.646760258057163  # Cordic(width=16, guard=None).gain
-        width = 16
-        self.amplitude_scale = (1 << width)/2/cordic_gain
-        self.phase_scale = 1 << width
-        self.frequency_scale = self.core.coarse_ref_period / parallelism
+        a_width = 16
+        f_width = 48
+        p_width = 16
+        self.amplitude_scale = (1 << a_width) / 2 / cordic_gain
+        self.phase_scale = 1 << p_width
+        self.frequency_scale = ((1 << f_width) / self.core.coarse_ref_period /
+                                parallelism)
 
     @kernel
     def set_amplitude_mu(self, amplitude=0):
@@ -26,7 +29,7 @@ class SAWG:
 
         :param amplitude: DDS amplitude in machine units.
         """
-        rtio_output(now_mu(), self.channel, 0, amplitude)
+        rtio_output(now_mu(), self.channel_base, 0, amplitude)
 
     @kernel
     def set_amplitude(self, amplitude=0):
@@ -42,7 +45,7 @@ class SAWG:
 
         :param frequency: DDS frequency in machine units.
         """
-        rtio_output(now_mu(), self.channel + 1, 0, frequency)
+        rtio_output(now_mu(), self.channel_base + 1, 0, frequency)
 
     @kernel
     def set_frequency(self, frequency=0):
@@ -58,7 +61,7 @@ class SAWG:
 
         :param phase: DDS phase in machine units.
         """
-        rtio_output(now_mu(), self.channel + 2, 0, phase)
+        rtio_output(now_mu(), self.channel_base + 2, 0, phase)
 
     @kernel
     def set_phase(self, phase=0):
