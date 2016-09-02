@@ -151,6 +151,29 @@ See :mod:`artiq.coredevice.i2c` for more details.
 
 For safe operation of the DDS buses (to prevent damage to the IO banks of the FPGA), the FMC VADJ rail of the KC705 should be changed to 3.3V. Plug the Texas Instruments USB-TO-GPIO PMBus adapter into the PMBus connector in the corner of the KC705 and use the Fusion Digital Power Designer software to configure (requires Windows). Write to chip number U55 (address 52), channel 4, which is the VADJ rail, to make it 3.3V instead of 2.5V.  Power cycle the KC705 board to check that the startup voltage on the VADJ rail is now 3.3V.
 
+Phaser
+++++++
+
+The Phaser adapter is an AD9154-FMC-EBZ, a 4 channel 2.4 GHz DAC on an FMC HPC card.
+
++--------------+------------+--------------+
+| RTIO channel | TTL line   | Capability   |
++==============+============+==============+
+| 0            | SMA_GPIO_N | Input+Output |
++--------------+------------+--------------+
+| 1            | LED        | Output       |
++--------------+------------+--------------+
+
+The board has RTIO SPI buses mapped as follows:
+
++--------------+-------------+-------------+-----------+------------+
+| RTIO channel | CS_N        | MOSI        | MISO      | CLK        |
++==============+=============+=============+===========+============+
+| 2            | DAC_CS_N    | DAC_MOSI    | DAC_MISO  | DAC_CLK    |
++--------------+-------------+-------------+-----------+------------+
+
+The SAWG channels start with RTIO channel number 3.
+
 Pipistrello
 -----------
 

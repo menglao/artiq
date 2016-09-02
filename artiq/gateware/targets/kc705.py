@@ -417,7 +417,7 @@ class Phaser(_NIST_Ions):
         rtio_channels.append(rtio.Channel.from_phy(
             phy, ofifo_depth=128, ififo_depth=128))
 
-        self.config["RTIO_FIRST_PHASER_CHANNEL"] = len(rtio_channels)
+        self.config["RTIO_FIRST_SAWG_CHANNEL"] = len(rtio_channels)
         sawgs = [sawg.Channel(width=16, parallelism=4) for i in range(4)]
         self.submodules += sawgs
 
