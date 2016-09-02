@@ -1,0 +1,63 @@
+# The RTIO channel numbers here are for Phaser on KC705.
+
+{
+    "comm": {
+        "type": "local",
+        "module": "artiq.coredevice.comm_tcp",
+        "class": "Comm",
+        "arguments": {"host": "kc705-phaser.lab.m-labs.hk"}
+    },
+    "core": {
+        "type": "local",
+        "module": "artiq.coredevice.core",
+        "class": "Core",
+        "arguments": {"ref_period": 1e-9}
+    },
+    "core_cache": {
+        "type": "local",
+        "module": "artiq.coredevice.cache",
+        "class": "CoreCache"
+    },
+    "ttl_sma": {
+        "type": "local",
+        "module": "artiq.coredevice.ttl",
+        "class": "TTLInOut",
+        "arguments": {"channel": 0}
+    },
+    "led": {
+        "type": "local",
+        "module": "artiq.coredevice.ttl",
+        "class": "TTLOut",
+        "arguments": {"channel": 1}
+    },
+    "dac0_spi": {
+        "type": "local",
+        "module": "artiq.coredevice.spi",
+        "class": "SPIMaster",
+        "arguments": {"channel": 2}
+    },
+    "sawg0": {
+        "type": "local",
+        "module": "artiq.coredevice.sawg",
+        "class": "SAWG",
+        "arguments": {"channel_base": 3, "parallelism": 4}
+    },
+    "sawg1": {
+        "type": "local",
+        "module": "artiq.coredevice.sawg",
+        "class": "SAWG",
+        "arguments": {"channel_base": 6, "parallelism": 4}
+    },
+    "sawg2": {
+        "type": "local",
+        "module": "artiq.coredevice.sawg",
+        "class": "SAWG",
+        "arguments": {"channel_base": 9, "parallelism": 4}
+    },
+    "sawg3": {
+        "type": "local",
+        "module": "artiq.coredevice.sawg",
+        "class": "SAWG",
+        "arguments": {"channel_base": 12, "parallelism": 4}
+    }
+}
