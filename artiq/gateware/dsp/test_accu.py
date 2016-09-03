@@ -3,9 +3,8 @@ import numpy as np
 from migen import *
 from migen.fhdl.verilog import convert
 
-from accu import Accu, PhasedAccu
-
-from tools import xfer
+from artiq.gateware.dsp.accu import Accu, PhasedAccu
+from artiq.gateware.dsp.tools import xfer
 
 
 def read(o, n):

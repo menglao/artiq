@@ -15,7 +15,7 @@ class DDSFast(Module):
         self.o = [Signal((width, True)) for i in range(parallelism)]
 
         self.parallelism = parallelism
-        self.latency = 0  # will be accumulated
+        self.latency = 1  # will be accumulated
 
         q = PhasedAccu(width, parallelism)
         self.submodules += q
@@ -38,7 +38,8 @@ class DDSFast(Module):
             ),
             If(self.p.stb,
                 eqh(q.i.p, self.p.p)
-            )
+            ),
+            q.i.stb.eq(self.f.stb | self.p.stb),
         ]
         self.comb += [
             self.a.ack.eq(1),
@@ -46,7 +47,6 @@ class DDSFast(Module):
             self.p.ack.eq(1),
             q.o.ack.eq(1),
             q.i.clr.eq(0),
-            q.i.stb.eq(self.f.stb | self.p.stb),
         ]
 
         c = []
