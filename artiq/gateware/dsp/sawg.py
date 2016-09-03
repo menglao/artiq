@@ -14,6 +14,7 @@ class DDSFast(Module):
 
         self.o = [Signal((width, True)) for i in range(parallelism)]
 
+        self.width = width
         self.parallelism = parallelism
         self.latency = 1  # will be accumulated
 

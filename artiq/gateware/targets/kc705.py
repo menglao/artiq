@@ -424,7 +424,7 @@ class Phaser(_NIST_Ions):
         # TODO: dummy, hookup jesd204b phy here
         o = Signal((16, True))
         for ch in sawgs:  # gather up dangling outputs
-            for oi in ch._ll.o:
+            for oi in ch.o:
                 o0, o = o, Signal.like(o)
                 self.sync += o.eq(o0 + oi)
         self.sync.rio_phy += platform.request("dds").d.eq(o)
