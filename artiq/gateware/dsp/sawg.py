@@ -10,7 +10,7 @@ class DDSFast(Module):
     def __init__(self, width, parallelism=4):
         a_width = width
         p_width = width
-        f_width = 3*width
+        f_width = 2*width
 
         self.o = [Signal((width, True)) for i in range(parallelism)]
 

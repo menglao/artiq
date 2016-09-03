@@ -16,15 +16,15 @@ class SAWG:
         self.channel_base = channel_base
         cordic_gain = 1.646760258057163  # Cordic(width=16, guard=None).gain
         a_width = 16
-        f_width = 48
+        f_width = 32
         p_width = 16
         self.amplitude_scale = (1 << a_width) / 2 / cordic_gain
         self.phase_scale = 1 << p_width
-        self.frequency_scale = ((1 << f_width) / self.core.coarse_ref_period /
+        self.frequency_scale = ((1 << f_width) * self.core.coarse_ref_period /
                                 parallelism)
 
     @kernel
-    def set_amplitude_mu(self, amplitude=0):
+    def set_amplitude_mu(self, amplitude: TInt32):
         """Set DDS amplitude (machine units).
 
         :param amplitude: DDS amplitude in machine units.
@@ -32,7 +32,7 @@ class SAWG:
         rtio_output(now_mu(), self.channel_base, 0, amplitude)
 
     @kernel
-    def set_amplitude(self, amplitude=0):
+    def set_amplitude(self, amplitude: TFloat):
         """Set DDS amplitude.
 
         :param amplitude: DDS amplitude relative to full-scale.
@@ -40,7 +40,7 @@ class SAWG:
         self.set_amplitude_mu(amplitude*self.amplitude_scale)
 
     @kernel
-    def set_frequency_mu(self, frequency=0):
+    def set_frequency_mu(self, frequency: TInt32):
         """Set DDS frequency (machine units).
 
         :param frequency: DDS frequency in machine units.
@@ -48,7 +48,7 @@ class SAWG:
         rtio_output(now_mu(), self.channel_base + 1, 0, frequency)
 
     @kernel
-    def set_frequency(self, frequency=0):
+    def set_frequency(self, frequency: TFloat):
         """Set DDS frequency.
 
         :param frequency: DDS frequency in Hz.
@@ -56,7 +56,7 @@ class SAWG:
         self.set_frequency_mu(frequency*self.frequency_scale)
 
     @kernel
-    def set_phase_mu(self, phase=0):
+    def set_phase_mu(self, phase: TInt32):
         """Set DDS phase (machine units).
 
         :param phase: DDS phase in machine units.
@@ -64,7 +64,7 @@ class SAWG:
         rtio_output(now_mu(), self.channel_base + 2, 0, phase)
 
     @kernel
-    def set_phase(self, phase=0):
+    def set_phase(self, phase: TFloat):
         """Set DDS phase.
 
         :param phase: DDS phase relative in turns.
