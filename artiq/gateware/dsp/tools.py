@@ -29,3 +29,22 @@ def xfer(dut, **kw):
 
 def eqh(a, b):
     return a[-len(b):].eq(b[-len(a):])
+
+
+def szip(*iters):
+    active = {it: None for it in iters}
+    while active:
+        for it in list(active):
+            while True:
+                try:
+                    val = it.send(active[it])
+                except StopIteration:
+                    del active[it]
+                    break
+                if val is None:
+                    break
+                else:
+                    active[it] = (yield val)
+        val = (yield None)
+        for it in active:
+            active[it] = val
