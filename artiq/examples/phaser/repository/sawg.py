@@ -6,7 +6,6 @@ class SAWGTest(EnvExperiment):
         self.setattr_device("core")
         self.setattr_device("led")
 
-        self.setattr_device("dac0_spi")
         self.setattr_device("sawg0")
         self.setattr_device("sawg1")
         self.setattr_device("sawg2")

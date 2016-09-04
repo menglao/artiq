@@ -30,34 +30,28 @@
         "class": "TTLOut",
         "arguments": {"channel": 1}
     },
-    "dac0_spi": {
-        "type": "local",
-        "module": "artiq.coredevice.spi",
-        "class": "SPIMaster",
-        "arguments": {"channel": 2}
-    },
     "sawg0": {
         "type": "local",
         "module": "artiq.coredevice.sawg",
         "class": "SAWG",
-        "arguments": {"channel_base": 3, "parallelism": 4}
+        "arguments": {"channel_base": 2, "parallelism": 4}
     },
     "sawg1": {
         "type": "local",
         "module": "artiq.coredevice.sawg",
         "class": "SAWG",
-        "arguments": {"channel_base": 6, "parallelism": 4}
+        "arguments": {"channel_base": 5, "parallelism": 4}
     },
     "sawg2": {
         "type": "local",
         "module": "artiq.coredevice.sawg",
         "class": "SAWG",
-        "arguments": {"channel_base": 9, "parallelism": 4}
+        "arguments": {"channel_base": 8, "parallelism": 4}
     },
     "sawg3": {
         "type": "local",
         "module": "artiq.coredevice.sawg",
         "class": "SAWG",
-        "arguments": {"channel_base": 12, "parallelism": 4}
+        "arguments": {"channel_base": 11, "parallelism": 4}
     }
 }

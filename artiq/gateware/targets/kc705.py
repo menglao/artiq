@@ -13,6 +13,7 @@ from migen.fhdl.specials import Keep
 from misoc.interconnect.csr import *
 from misoc.interconnect import wishbone
 from misoc.cores import gpio
+from misoc.cores import spi as spi_csr
 from misoc.integration.soc_core import mem_decoder
 from misoc.targets.kc705 import MiniSoC, soc_kc705_args, soc_kc705_argdict
 from misoc.integration.builder import builder_args, builder_argdict
@@ -390,6 +391,13 @@ class NIST_QC2(_NIST_Ions):
 
 
 class Phaser(_NIST_Ions):
+    csr_map = {}
+    csr_map.update(_NIST_Ions.csr_map)
+    csr_map["spi_fmc_hpc"] = None
+    mem_map = {}
+    mem_map.update(_NIST_Ions.mem_map)
+    mem_map["spi_fmc_hpc"] = 0x40000000  # (shadow @0xc0000000)
+
     def __init__(self, cpu_type="or1k", **kwargs):
         _NIST_Ions.__init__(self, cpu_type, **kwargs)
 
@@ -410,12 +418,10 @@ class Phaser(_NIST_Ions):
 
         self.config["RTIO_REGULAR_TTL_COUNT"] = len(rtio_channels)
 
-        self.config["RTIO_FIRST_SPI_CHANNEL"] = len(rtio_channels)
-        # TODO: dummy, hookup ad9154 spi here
-        phy = spi.SPIMaster(self.platform.request("spi", 0))
-        self.submodules += phy
-        rtio_channels.append(rtio.Channel.from_phy(
-            phy, ofifo_depth=128, ififo_depth=128))
+        # TODO: dummy, hookup actual fmc hpc spi here
+        self.submodules.spi_fmc_hpc = spi_csr.SPIMaster(
+            self.platform.request("spi", 0))
+        self.register_kernel_cpu_csrdevice("spi_fmc_hpc")
 
         self.config["RTIO_FIRST_SAWG_CHANNEL"] = len(rtio_channels)
         sawgs = [sawg.Channel(width=16, parallelism=4) for i in range(4)]
